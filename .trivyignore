@@ -1,0 +1,4 @@
+# AWS-0132: S3 state bucket uses SSE-S3 (AES256), not a customer-managed KMS key.
+# Accepted: a KMS key costs ~$1/month and this is a single-owner learning bucket.
+# Revisit if this ever holds real data. Decided 2026-11-18.
+AWS-0132
