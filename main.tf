@@ -19,4 +19,12 @@ terraform {
 provider "aws" {
   region  = "eu-north-1"
   profile = "lab"
+
+  default_tags {
+    tags = {
+      project    = "visit-counter-aws"
+      owner      = "Rayyan98Dev"
+      managed-by = "terraform"
+    }
+  }
 }
