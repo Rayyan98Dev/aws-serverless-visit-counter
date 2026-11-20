@@ -15,3 +15,8 @@ terraform {
     profile      = "lab"
   }
 }
+
+provider "aws" {
+  region  = "eu-north-1"
+  profile = "lab"
+}
