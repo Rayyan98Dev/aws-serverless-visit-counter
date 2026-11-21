@@ -26,23 +26,12 @@ resource "aws_lambda_function" "counter" {
   depends_on = [aws_cloudwatch_log_group.lambda, aws_iam_role_policy.lambda]
 }
 
+# With authorization_type = "NONE" this resource adds both public permissions
+# itself (lambda:InvokeFunctionUrl and lambda:InvokeFunction via the URL).
+# Separate aws_lambda_permission resources would only duplicate them.
 resource "aws_lambda_function_url" "counter" {
   function_name      = aws_lambda_function.counter.function_name
   authorization_type = "NONE"
-}
-
-resource "aws_lambda_permission" "url" {
-  function_name          = aws_lambda_function.counter.function_name
-  principal              = "*"
-  action                 = "lambda:InvokeFunctionUrl"
-  function_url_auth_type = "NONE"
-}
-
-resource "aws_lambda_permission" "invoke" {
-  function_name            = aws_lambda_function.counter.function_name
-  principal                = "*"
-  action                   = "lambda:InvokeFunction"
-  invoked_via_function_url = true
 }
 
 output "url" {
