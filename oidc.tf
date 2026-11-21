@@ -36,3 +36,39 @@ resource "aws_iam_role" "github_ci" {
   name               = "visit-counter-github-ci"
   assume_role_policy = data.aws_iam_policy_document.github_trust[0].json
 }
+
+locals {
+  state_bucket = "rayyan98dev-aws-serverless-visit-counter-tfstate"
+}
+
+data "aws_iam_policy_document" "github_ci_state" {
+  count = var.enable_github_oidc ? 1 : 0
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::${local.state_bucket}"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::${local.state_bucket}/visit-counter/terraform.tfstate"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
+    resources = ["arn:aws:s3:::${local.state_bucket}/visit-counter/terraform.tfstate.tflock"]
+  }
+}
+
+resource "aws_iam_role_policy" "github_ci_state" {
+  count  = var.enable_github_oidc ? 1 : 0
+  name   = "github-ci-state"
+  role   = aws_iam_role.github_ci[0].id
+  policy = data.aws_iam_policy_document.github_ci_state[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "github_ci_readonly" {
+  count      = var.enable_github_oidc ? 1 : 0
+  role       = aws_iam_role.github_ci[0].name
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
